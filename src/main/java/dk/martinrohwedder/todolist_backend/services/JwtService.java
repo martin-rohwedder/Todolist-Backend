@@ -1,5 +1,6 @@
 package dk.martinrohwedder.todolist_backend.services;
 
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -12,16 +13,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class JwtService {
-
     private final JwtEncoder jwtEncoder;
 
-    public JwtService(JwtEncoder jwtEncoder) {
-        this.jwtEncoder = jwtEncoder;
-    }
-
     public String generateToken(UserDetails user) {
-
         Instant now = Instant.now();
 
         String scope = user.getAuthorities().stream()
@@ -36,7 +32,6 @@ public class JwtService {
                 .claim("scope", scope)
                 .build();
 
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims))
-                .getTokenValue();
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 }
