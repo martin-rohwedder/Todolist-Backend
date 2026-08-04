@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: 'postgres:18.4-alpine3.24'
+    environment:
+      - 'POSTGRES_DB=mydatabase'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - '5432'
+
+volumes:
+  pgdata:
