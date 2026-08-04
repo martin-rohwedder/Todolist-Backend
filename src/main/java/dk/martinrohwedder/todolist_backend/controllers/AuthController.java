@@ -3,6 +3,7 @@ package dk.martinrohwedder.todolist_backend.controllers;
 import dk.martinrohwedder.todolist_backend.dtos.LoginRequest;
 import dk.martinrohwedder.todolist_backend.dtos.LoginResponse;
 import dk.martinrohwedder.todolist_backend.services.JwtService;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,15 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@AllArgsConstructor
 public class AuthController {
-
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-    }
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
