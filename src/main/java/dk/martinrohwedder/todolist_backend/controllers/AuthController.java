@@ -2,36 +2,31 @@ package dk.martinrohwedder.todolist_backend.controllers;
 
 import dk.martinrohwedder.todolist_backend.dtos.LoginRequest;
 import dk.martinrohwedder.todolist_backend.dtos.LoginResponse;
-import dk.martinrohwedder.todolist_backend.services.JwtService;
-import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import dk.martinrohwedder.todolist_backend.dtos.RegisterRequest;
+import dk.martinrohwedder.todolist_backend.dtos.RegisterResponse;
+import dk.martinrohwedder.todolist_backend.services.AuthService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/auth")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+    private final AuthService authService;
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.username(),
-                            request.password()
-                    )
-        );
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
+    }
 
-        UserDetails user = (UserDetails) authentication.getPrincipal();
-        String token = jwtService.generateToken(user);
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+        var response = authService.register(request);
+        var uriLocation = UriComponentsBuilder.fromPath("/api/users/{id}").buildAndExpand(response.id()).toUri();
 
-        return new LoginResponse(token);
+        return ResponseEntity.created(uriLocation).body(response);
     }
 }

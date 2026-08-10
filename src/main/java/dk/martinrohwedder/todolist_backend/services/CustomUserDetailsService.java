@@ -1,28 +1,28 @@
 package dk.martinrohwedder.todolist_backend.services;
 
-import lombok.AllArgsConstructor;
+import dk.martinrohwedder.todolist_backend.entities.AppUser;
+import dk.martinrohwedder.todolist_backend.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (!username.equals("martin")) {
-            throw new UsernameNotFoundException(username);
-        }
+        AppUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
 
         return User.builder()
-                .username("martin")
-                .password(passwordEncoder.encode("password"))
-                .roles("USER")
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole())
                 .build();
     }
 }
