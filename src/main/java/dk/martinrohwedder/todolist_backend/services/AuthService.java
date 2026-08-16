@@ -26,8 +26,7 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
-        Authentication authentication =
-                authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
                                 request.username(),
                                 request.password()));
@@ -40,7 +39,7 @@ public class AuthService {
 
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new UsernameAlreadyExistsException(request.username());
+            throw new UsernameAlreadyExistsException("The username: '" + request.username() + "' already exists");
         }
 
         AppUser user = AppUser.builder()
