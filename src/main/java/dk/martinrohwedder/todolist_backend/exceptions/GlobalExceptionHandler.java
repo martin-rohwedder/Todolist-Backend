@@ -27,12 +27,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleUsernameExists(UsernameAlreadyExistsException ex) {
-        return Map.of("username", ex.getMessage());
+        return Map.of("message", ex.getMessage());
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleUsernameNotFound(UsernameNotFoundException ex) {
-        return Map.of("username", "User with username '" + ex.getMessage() + "' could not be found");
+        return Map.of("message", "User with username '" + ex.getMessage() + "' could not be found");
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleResourceNotFound(ResourceNotFoundException ex) {
+        return Map.of("message", ex.getMessage());
     }
 }
