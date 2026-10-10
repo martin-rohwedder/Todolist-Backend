@@ -214,7 +214,7 @@ class TodolistItemControllerIntegrationTest {
     void createItem_shouldReturn400_whenTitleIsLongerThanMaxSizeOf255() throws Exception {
         Todolist todolist = createTodolist("testuser", "Shopping list");
 
-        TodolistItemRequest request = new TodolistItemRequest("A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters.");
+        TodolistItemRequest request = new TodolistItemRequest("A".repeat(256));
 
         mockMvc.perform(post("/api/todolists/{todolistId}/items", todolist.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -286,7 +286,7 @@ class TodolistItemControllerIntegrationTest {
         Todolist todolist = createTodolist("testuser", "Shopping list");
         TodolistItem item = createItem(todolist, "Old title");
 
-        TodolistItemRequest request = new TodolistItemRequest("A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters.");
+        TodolistItemRequest request = new TodolistItemRequest("A".repeat(256));
 
         mockMvc.perform(put("/api/todolists/{todolistId}/items/{itemId}", todolist.getId(), item.getId())
                         .contentType(MediaType.APPLICATION_JSON)
