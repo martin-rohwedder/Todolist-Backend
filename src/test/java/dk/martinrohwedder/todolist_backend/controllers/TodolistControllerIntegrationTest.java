@@ -199,6 +199,19 @@ class TodolistControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser(username = "testuser")
+    void createTodolist_shouldReturn400_whenTitleIsLongerThanMaxSizeOf50() throws Exception {
+        createUser("testuser");
+
+        var request = new TodolistRequest("A very long title, which is longer than 50 characters");
+
+        mockMvc.perform(post("/api/todolists")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
     // PUT: /api/todolists/{id}
 
     @Test

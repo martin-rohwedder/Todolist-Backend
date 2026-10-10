@@ -211,6 +211,19 @@ class TodolistItemControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    void createItem_shouldReturn400_whenTitleIsLongerThanMaxSizeOf255() throws Exception {
+        Todolist todolist = createTodolist("testuser", "Shopping list");
+
+        TodolistItemRequest request = new TodolistItemRequest("A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters.");
+
+        mockMvc.perform(post("/api/todolists/{todolistId}/items", todolist.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
     void createItem_shouldReturn404_whenTodolistBelongsToAnotherUser() throws Exception {
         Todolist todolist = createTodolist("anotheruser", "Private list");
 
@@ -260,6 +273,20 @@ class TodolistItemControllerIntegrationTest {
         TodolistItem item = createItem(todolist, "Old title");
 
         TodolistItemRequest request = new TodolistItemRequest("");
+
+        mockMvc.perform(put("/api/todolists/{todolistId}/items/{itemId}", todolist.getId(), item.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void updateItem_shouldReturn400_whenTitleIsLongerThanMaxSizeOf255() throws Exception {
+        Todolist todolist = createTodolist("testuser", "Shopping list");
+        TodolistItem item = createItem(todolist, "Old title");
+
+        TodolistItemRequest request = new TodolistItemRequest("A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters. A very long title, which is longer than 255 characters.");
 
         mockMvc.perform(put("/api/todolists/{todolistId}/items/{itemId}", todolist.getId(), item.getId())
                         .contentType(MediaType.APPLICATION_JSON)
