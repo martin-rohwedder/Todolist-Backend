@@ -1,0 +1,9 @@
+target/
+.git/
+.github
+.idea/
+.vscode/
+*.iml
+README.md
+compose.yaml
+.env
