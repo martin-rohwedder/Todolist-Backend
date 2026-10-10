@@ -267,7 +267,7 @@ class TodolistItemControllerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // PATCH: /api/todolists/{todolistId}/items/{itemId}/toogleCompleted
+    // PATCH: /api/todolists/{todolistId}/items/{itemId}/toggleCompleted
 
     @Test
     @WithMockUser(username = "testuser")
@@ -275,7 +275,7 @@ class TodolistItemControllerIntegrationTest {
         Todolist todolist = createTodolist("testuser", "Shopping list");
         TodolistItem item = createItem(todolist, "Buy milk");
 
-        mockMvc.perform(patch("/api/todolists/{todolistId}/items/{itemId}/toogleCompleted", todolist.getId(), item.getId()))
+        mockMvc.perform(patch("/api/todolists/{todolistId}/items/{itemId}/toggleCompleted", todolist.getId(), item.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.completed").value(true));
     }
@@ -288,7 +288,7 @@ class TodolistItemControllerIntegrationTest {
         item.setCompleted(true);
         todolistItemRepository.save(item);
 
-        mockMvc.perform(patch("/api/todolists/{todolistId}/items/{itemId}/toogleCompleted", todolist.getId(), item.getId()))
+        mockMvc.perform(patch("/api/todolists/{todolistId}/items/{itemId}/toggleCompleted", todolist.getId(), item.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.completed").value(false));
     }
@@ -298,7 +298,7 @@ class TodolistItemControllerIntegrationTest {
     void toggleCompleted_shouldReturn404_whenItemDoesNotExist() throws Exception {
         Todolist todolist = createTodolist("testuser", "Shopping list");
 
-        mockMvc.perform(patch("/api/todolists/{todolistId}/items/{itemId}/toogleCompleted", todolist.getId(), UUID.randomUUID()))
+        mockMvc.perform(patch("/api/todolists/{todolistId}/items/{itemId}/toggleCompleted", todolist.getId(), UUID.randomUUID()))
                 .andExpect(status().isNotFound());
     }
 
