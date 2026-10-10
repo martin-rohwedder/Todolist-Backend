@@ -57,7 +57,7 @@ public class TodolistItemController {
         return ResponseEntity.ok(TodolistItemResponse.from(item));
     }
 
-    @PatchMapping("/{itemId}/toogleCompleted")
+    @PatchMapping("/{itemId}/toggleCompleted")
     public ResponseEntity<TodolistItemResponse> toggleCompleted(@PathVariable UUID todolistId, @PathVariable UUID itemId, Authentication authentication) {
         String username = authentication.getName();
         var item = todolistItemService.toggleCompleted(todolistId, itemId, username);
