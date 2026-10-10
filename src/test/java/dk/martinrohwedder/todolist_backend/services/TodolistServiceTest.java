@@ -169,6 +169,54 @@ class TodolistServiceTest {
     }
 
     // *********************************************************
+    // updateTodolist()
+    // *********************************************************
+
+    @Test
+    void updateTodolist_shouldUpdateTitleAndSaveTodolist() {
+        UUID todolistId = UUID.randomUUID();
+
+        AppUser user = AppUser.builder()
+                .username("testuser")
+                .role("USER")
+                .build();
+
+        Todolist todolist = Todolist.builder()
+                .id(todolistId)
+                .title("Old title")
+                .user(user)
+                .build();
+
+        when(todolistRepository.findByIdAndUserUsername(todolistId, "testuser"))
+                .thenReturn(Optional.of(todolist));
+
+        when(todolistRepository.save(todolist))
+                .thenReturn(todolist);
+
+        Todolist result = todolistService.updateTodolist(todolistId, "testuser", "New title");
+
+        assertThat(result).isSameAs(todolist);
+        assertThat(result.getTitle()).isEqualTo("New title");
+
+        verify(todolistRepository).findByIdAndUserUsername(todolistId, "testuser");
+        verify(todolistRepository).save(todolist);
+    }
+
+    @Test
+    void updateTodolist_shouldThrowException_whenTodolistDoesNotExistForUser() {
+        UUID todolistId = UUID.randomUUID();
+
+        when(todolistRepository.findByIdAndUserUsername(todolistId, "testuser"))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> todolistService.updateTodolist(todolistId, "testuser", "New title"))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Todolist not found");
+
+        verify(todolistRepository, never()).save(any(Todolist.class));
+    }
+
+    // *********************************************************
     // deleteTodolist()
     // *********************************************************
 

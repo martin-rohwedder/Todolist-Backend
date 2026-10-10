@@ -21,9 +21,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -195,6 +197,92 @@ class TodolistControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    // PUT: /api/todolists/{id}
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void updateTodolist_shouldReturnUpdatedTodolist() throws Exception {
+        AppUser user = createUser("testuser");
+
+        Todolist todolist = Todolist.builder()
+                .title("Old title")
+                .user(user)
+                .build();
+
+        todolist = todolistRepository.save(todolist);
+
+        TodolistRequest request = new TodolistRequest("New title");
+
+        mockMvc.perform(put("/api/todolists/{id}", todolist.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(todolist.getId().toString()))
+                .andExpect(jsonPath("$.title").value("New title"));
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void updateTodolist_shouldReturn400_whenTitleIsInvalid() throws Exception {
+        createUser("testuser");
+
+        TodolistRequest request = new TodolistRequest("");
+
+        mockMvc.perform(put("/api/todolists/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void updateTodolist_shouldReturn400_whenTitleIsLongerThanMaxSizeOf50() throws Exception {
+        createUser("testuser");
+
+        // Title max size = 50
+        TodolistRequest request = new TodolistRequest("A very long title, which is longer than 50 characters");
+
+        mockMvc.perform(put("/api/todolists/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void updateTodolist_shouldReturn404_whenTodolistDoesNotExist() throws Exception {
+        TodolistRequest request = new TodolistRequest("New title");
+
+        mockMvc.perform(put("/api/todolists/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void updateTodolist_shouldReturn404_whenTodolistBelongsToAnotherUser() throws Exception {
+        AppUser anotherUser = createUser("anotheruser");
+
+        Todolist todolist = Todolist.builder()
+                .title("Another user's list")
+                .user(anotherUser)
+                .build();
+
+        todolist = todolistRepository.save(todolist);
+
+        TodolistRequest request = new TodolistRequest("Updated title");
+
+        mockMvc.perform(put("/api/todolists/{id}", todolist.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+
+        Todolist storedTodolist = todolistRepository.findById(todolist.getId()).orElseThrow();
+
+        assertThat(storedTodolist.getTitle()).isEqualTo("Another user's list");
     }
 
     // DELETE: /api/todolists/{id}

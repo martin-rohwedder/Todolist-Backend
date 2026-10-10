@@ -49,6 +49,14 @@ public class TodolistController {
         return ResponseEntity.created(uriLocation).body(TodolistResponse.from(todolist));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TodolistResponse> updateTodolist(@PathVariable UUID id, @Valid @RequestBody TodolistRequest request, Authentication authentication) {
+        String username = authentication.getName();
+        var todolist = todolistService.updateTodolist(id, username, request.title());
+
+        return ResponseEntity.ok(TodolistResponse.from(todolist));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTodolist(@PathVariable UUID id, Authentication authentication) {
         String username = authentication.getName();

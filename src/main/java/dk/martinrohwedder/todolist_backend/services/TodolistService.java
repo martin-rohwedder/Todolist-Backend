@@ -38,6 +38,13 @@ public class TodolistService {
         return todolistRepository.save(todolist);
     }
 
+    public Todolist updateTodolist(UUID id, String username, String title) {
+        Todolist todolist = getTodolist(id, username);
+        todolist.setTitle(title);
+
+        return todolistRepository.save(todolist);
+    }
+
     public void deleteTodolist(UUID id, String username) {
         Todolist todolist = todolistRepository.findByIdAndUserUsername(id, username)
                 .orElseThrow(() -> new ResourceNotFoundException("Todolist not found"));
