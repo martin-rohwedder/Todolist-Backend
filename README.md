@@ -47,8 +47,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql
-    ports:
-      - '5432:5432'
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 10s
@@ -58,7 +56,7 @@ services:
 
   todolist_backend:
     image: ghcr.io/martin-rohwedder/todolist-backend:latest
-    restart: on-failure:3
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -84,9 +82,9 @@ volumes:
 Create a `.env` file with the following environment variables (edit credentials to what you prefer)
 
 ```dotenv
-POSTGRES_DB_NAME = mydatabase
-POSTGRES_DB_USER = myuser
-POSTGRES_DB_PASSWORD = secret
+POSTGRES_DB_NAME=mydatabase
+POSTGRES_DB_USER=myuser
+POSTGRES_DB_PASSWORD=secret
 ```
 
 ### 3. How to start and stop the application
